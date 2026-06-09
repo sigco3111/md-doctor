@@ -5,6 +5,23 @@ All notable changes to **md-doctor** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-06-09
+
+### Added
+- 🇰🇷 `--korean` opt-in 플래그 — 한국어 띄어쓰기/맞춤법 검사 (KS1~KS5)
+  - KS1: 영어 단어 + 한글 사이 띄어쓰기 권장
+  - KS2: 한자 + 한글 사이 띄어쓰기 권장
+  - KS3: 숫자 + 한글 단위 사이 띄어쓰기 없음 (WARNING)
+  - KS4: 중복 공백 발견
+  - KS5: `...` → `…` 권장
+- 🛡️ zero-deps 유지 (정규식 기반, 외부 사전 미사용)
+- ✅ 12 신규 테스트 (korean_grammar 10 + CLI 2), 총 119개
+
+### Notes
+- 기본 비활성 — `--korean` 명시 시에만 활성.
+- 다른 검사와 자동 결합 (--korean README.md 만으로 가능).
+- zero-deps 정책 유지.
+
 ## [0.4.0] - 2026-06-09
 
 ### Added
