@@ -157,3 +157,24 @@ def test_local_directory_emits_error(tmp_path: Path):
     dl = [d for d in fr.diagnoses if d.check == "dead-links"]
     assert len(dl) == 1
     assert "디렉터리" in dl[0].message
+
+
+# DL002: HTML <a href> --------------------------------------------------
+
+
+def test_html_anchor_dead_emits_dl002(tmp_path: Path, mock_head_404):
+    md = tmp_path / "doc.md"
+    md.write_text('<a href="https://missing.example.com">x</a>\n', encoding="utf-8")
+    fr = diagnose_file(md)
+    dl002 = [d for d in fr.diagnoses if d.rule == "DL002"]
+    assert len(dl002) == 1
+    assert dl002[0].severity is Severity.ERROR
+    assert "404" in dl002[0].message
+
+
+def test_html_anchor_existing_no_diagnosis(tmp_path: Path, mock_head_ok):
+    md = tmp_path / "doc.md"
+    md.write_text('<a href="https://example.com">x</a>\n', encoding="utf-8")
+    fr = diagnose_file(md)
+    dl = [d for d in fr.diagnoses if d.check == "dead-links"]
+    assert dl == []
