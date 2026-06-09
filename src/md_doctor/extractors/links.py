@@ -63,18 +63,9 @@ def _parse_definitions(lines: list[str]) -> dict[str, str]:
 
 
 def _strip_inline_code(line: str) -> str:
-    """인라인 코드(`...`) 영역을 공백으로 치환 (위치 보존)."""
-    out: list[str] = []
-    in_code = False
-    for ch in line:
-        if ch == "`":
-            in_code = not in_code
-            out.append(" ")
-        elif in_code:
-            out.append(" ")
-        else:
-            out.append(ch)
-    return "".join(out)
+    """``code_fence.strip_inline_code`` 위임."""
+    from md_doctor.extractors.code_fence import strip_inline_code
+    return strip_inline_code(line)
 
 
 def _emit_inline(
