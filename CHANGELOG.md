@@ -5,6 +5,25 @@ All notable changes to **md-doctor** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-06-09
+
+### Added
+- 🔧 `md-doctor --fix` 플래그 — 6개 안전한 자동 변환
+  - F1: 트레일링 newline 추가
+  - F2: 트레일링 공백 제거
+  - F3: H1/H2 헤딩 다음 빈 줄 보장
+  - F4: 빈 헤딩 제거
+  - F5: UTF-8 BOM 제거
+  - F6: CRLF → LF
+- 🧪 `fixers/` 패키지 — `apply_fixes()`, `FixResult`
+- 🛡️ 기본 in-place + `--backup .bak`, `--no-backup`/`--dry-run`/`--format json` 옵션
+- ✅ 15 신규 테스트 (fixers 10 + fix CLI 5), 총 107개
+
+### Notes
+- 진단과 독립 — 사용자가 명시적으로 `--fix` 호출.
+- 트리 fix 는 v0.4.0 범위 외 (v0.4.1+).
+- zero-deps 정책 유지.
+
 ## [0.3.0] - 2026-06-09
 
 ### Added

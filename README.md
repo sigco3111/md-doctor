@@ -65,6 +65,12 @@ md-doctor README.md --checks token-stats,heading-consistency
 
 # 사용 가능한 검사 목록
 md-doctor --list-checks
+
+# 자동 후처리 (안전한 변환만, in-place + .bak 백업)
+md-doctor --fix README.md
+md-doctor --fix README.md --dry-run      # 변경 사항만 표시
+md-doctor --fix README.md --no-backup    # 백업 생략
+md-doctor --fix README.md --format json -o diff.json
 ```
 
 ### Python API
@@ -154,6 +160,7 @@ jobs:
 - **0.2.0** ✅ — broken-images (로컬) 활성화
 - **0.2.1** ✅ — dead-links (로컬 + URL HEAD) 활성화
 - **0.3.0** ✅ — GFM/CommonMark 린트 (gfm-lint + HTML 추출)
+- **0.4.0** ✅ — md-doctor --fix (6개 안전 변환)
 - **0.3.0** — GFM/CommonMark 규칙 린트, 코드펜스 내부 인식 정확도 개선
 - **0.4.0** — `md-doctor fix` 자동 후처리 (안전한 변환만: trailing newline 등)
 - **0.5.0** — 한국어 띄어쓰기/맞춤법 검사 (외부 사전 연동, opt-in)
