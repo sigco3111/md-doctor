@@ -39,9 +39,9 @@ def head_request(url: str, timeout: float = _DEFAULT_TIMEOUT) -> int:
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.status
+            return int(resp.status)
     except urllib.error.HTTPError as e:
-        return e.code
+        return int(e.code)
 
 
 class DeadLinksCheck(BaseCheck):
