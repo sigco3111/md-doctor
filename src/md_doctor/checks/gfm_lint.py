@@ -7,7 +7,11 @@ from collections.abc import Iterator
 from typing import Any
 
 from md_doctor.checks import BaseCheck
-from md_doctor.extractors.code_fence import CodeFence, mark_code_regions
+from md_doctor.extractors.code_fence import (
+    CodeFence,
+    is_in_code_region,
+    mark_code_regions,
+)
 from md_doctor.extractors.html import extract_html_refs
 from md_doctor.models import Diagnosis, Severity
 
@@ -136,15 +140,8 @@ def _check_hc008(lines, fences) -> Iterator[Diagnosis]:
 
 
 def _is_in_fence(line_no: int, fences: list[CodeFence]) -> bool:
-    """펜스 시작/끝 자체는 검사 대상 (라인이 펜스 boundary 면 스킵)."""
-    for f in fences:
-        if f.end_line is None:
-            if line_no >= f.start_line:
-                return True
-        else:
-            if f.start_line <= line_no <= f.end_line:
-                return True
-    return False
+    """해당 줄이 펜스 내부(콘텐츠)인지. boundary 자체는 검사 대상."""
+    return is_in_code_region(line_no, fences)
 
 
 def _count_table_columns(row: str) -> int:

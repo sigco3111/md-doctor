@@ -58,6 +58,7 @@ def default_checks() -> CheckRegistry:
     """
     from md_doctor.checks.broken_images import BrokenImagesCheck
     from md_doctor.checks.dead_links import DeadLinksCheck
+    from md_doctor.checks.gfm_lint import GfmLintCheck
     from md_doctor.checks.heading_consistency import HeadingConsistencyCheck
     from md_doctor.checks.token_stats import TokenStatsCheck
 
@@ -67,6 +68,7 @@ def default_checks() -> CheckRegistry:
             HeadingConsistencyCheck(),
             BrokenImagesCheck(),
             DeadLinksCheck(),
+            GfmLintCheck(),
         ]
     )
 

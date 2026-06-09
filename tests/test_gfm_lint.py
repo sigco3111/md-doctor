@@ -98,4 +98,10 @@ def test_gfm_lint_in_code_fence_ignored(tmp_path: Path):
     md = tmp_path / "code.md"
     md.write_text("```\n- a\n* b\n<div>x</div>\n```\n", encoding="utf-8")
     fr = diagnose_file(md)
-    assert all(d.check != "gfm-lint" for d in fr.diagnoses)
+    # HC005/HC007 은 펜스 **내용**만 검사 → 0개.
+    # HC006 은 펜스 marker 자체의 언어 미지정 (line 1) — 정상 동작.
+    gfm = [d for d in fr.diagnoses if d.check == "gfm-lint"]
+    rules = {d.rule for d in gfm}
+    assert "HC005" not in rules
+    assert "HC007" not in rules
+    # HC006 은 발행될 수 있음 (언어 미지정 펜스)
