@@ -1,9 +1,14 @@
-"""CLI 진입점 — ``md-doctor <path>`` 또는 ``python -m md_doctor``."""
+"""CLI 진입점 — ``md-doctor <path>`` 또는 ``md-doctor --fix <path>`` 또는 ``python -m md_doctor``.
+
+v0.4.0+ 에서 ``--fix`` 플래그로 자동 후처리 모드 진입.
+기존 ``md-doctor <path>`` 동작은 100% 보존.
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -74,6 +79,26 @@ def _build_parser() -> argparse.ArgumentParser:
         "--list-checks",
         action="store_true",
         help="사용 가능한 검사 모듈 목록을 출력하고 종료",
+    )
+    parser.add_argument(
+        "--fix",
+        action="store_true",
+        help="자동 후처리 (6개 안전한 변환) — in-place 기본",
+    )
+    parser.add_argument(
+        "--backup",
+        default=".bak",
+        help="--fix 모드 백업 접미사 (기본: .bak, --no-backup 으로 비활성)",
+    )
+    parser.add_argument(
+        "--no-backup",
+        action="store_true",
+        help="--fix 모드 백업 생략",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="--fix 모드 실제 변경 없이 요약만",
     )
     parser.add_argument(
         "--version",
@@ -171,15 +196,74 @@ def _format_github(report, min_sev: Severity) -> str:
             level = {"info": "notice", "warning": "warning", "error": "error"}[d.severity.value]
             file = str(fr.path)
             line = d.line or 1
-            # 메시지에서 줄바꿈 → %0A
             msg = d.message.replace("\n", "%0A").replace("'", "''")
             lines.append(f"::{level} file={file},line={line}::{msg}")
     return "\n".join(lines)
 
 
+def _run_fix(args) -> int:
+    """v0.4.0+ 자동 후처리."""
+    from md_doctor.fixers import apply_fixes
+
+    path: Path = args.path
+    if not path.exists():
+        print(f"❌ 경로가 존재하지 않습니다: {path}", file=sys.stderr)
+        return 2
+
+    try:
+        original = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        original = path.read_text(encoding="utf-8", errors="replace")
+
+    result = apply_fixes(original)
+
+    if not args.dry_run and result.fixed != original:
+        if not args.no_backup:
+            backup_path = path.with_suffix(path.suffix + args.backup)
+            shutil.copy2(path, backup_path)
+        path.write_text(result.fixed, encoding="utf-8")
+
+    if args.format == "json":
+        payload = {
+            "version": __version__,
+            "file": str(path),
+            "dry_run": args.dry_run,
+            "applied": result.changes,
+            "changed_lines": result.changed_lines,
+            "before": result.original,
+            "after": result.fixed,
+        }
+        out = json.dumps(payload, ensure_ascii=False, indent=2)
+    else:
+        lines: list[str] = []
+        lines.append(f"🔧 md-doctor v{__version__} fix — {path}")
+        if result.changes:
+            lines.append(
+                f"   ✅ 변경 {len(result.changes)}건 "
+                f"({', '.join(result.changes)})"
+            )
+            for ln in result.changed_lines:
+                lines.append(f"   - 라인 {ln}")
+        else:
+            lines.append("   ✅ 변경 없음 (이미 깔끔)")
+        if args.dry_run:
+            lines.append("   (dry-run: 실제 변경 X)")
+        out = "\n".join(lines)
+
+    if args.output:
+        args.output.write_text(out, encoding="utf-8")
+    else:
+        print(out)
+
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
+
+    if args.fix:
+        return _run_fix(args)
 
     if args.list_checks:
         from md_doctor.checks import default_checks
