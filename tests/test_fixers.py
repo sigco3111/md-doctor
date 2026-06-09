@@ -20,9 +20,12 @@ def test_fix_f2_trailing_whitespace():
 
 
 def test_fix_f3_heading_blank_line():
-    """F3: H1/H2 헤딩 다음 빈 줄 보장."""
+    """F3: H1/H2 헤딩 다음 빈 줄 보장.
+
+    F1 (트레일링 newline) 도 함께 적용되므로 trailing newline 포함 기대.
+    """
     result = apply_fixes("# Title\n본문")
-    assert result.fixed == "# Title\n\n본문"
+    assert result.fixed == "# Title\n\n본문\n"
     assert "F3" in result.changes
 
 
@@ -34,17 +37,22 @@ def test_fix_f4_empty_heading():
 
 
 def test_fix_f5_strip_bom():
-    """F5: UTF-8 BOM 제거."""
+    """F5: UTF-8 BOM 제거.
+
+    F1 (트레일링 newline) 도 함께 적용.
+    """
     result = apply_fixes("\ufeff# Title")
-    assert result.fixed == "# Title"
+    assert result.fixed == "# Title\n"
     assert "F5" in result.changes
 
 
 def test_fix_f6_crlf_to_lf():
-    """F6: CRLF → LF."""
+    """F6: CRLF → LF. trailing newline 이미 있으므로 F1 스킵."""
     result = apply_fixes("line 1\r\nline 2\r\n")
     assert result.fixed == "line 1\nline 2\n"
     assert "F6" in result.changes
+    # F1 은 trailing newline 이미 있어서 스킵
+    assert "F1" not in result.changes
 
 
 def test_fix_clean_no_changes():
