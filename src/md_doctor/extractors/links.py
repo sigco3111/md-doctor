@@ -13,7 +13,6 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterator
 from dataclasses import dataclass
 
 
@@ -49,9 +48,7 @@ def _is_skippable_url(url: str) -> bool:
     """검사하지 않는 URL 스킴/패턴."""
     if url.startswith(("mailto:", "data:", "javascript:", "tel:")):
         return True
-    if url.startswith("#"):
-        return True
-    return False
+    return bool(url.startswith("#"))
 
 
 def _parse_definitions(lines: list[str]) -> dict[str, str]:

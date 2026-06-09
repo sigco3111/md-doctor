@@ -16,7 +16,6 @@ from md_doctor.checks import BaseCheck
 from md_doctor.extractors.links import extract_link_refs
 from md_doctor.models import Diagnosis, Severity
 
-
 _DEFAULT_TIMEOUT = 5.0
 _USER_AGENT = "md-doctor/0.2.1 (+https://github.com/sigco3111/md-doctor)"
 
