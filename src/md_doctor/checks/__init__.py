@@ -66,8 +66,7 @@ def default_checks() -> CheckRegistry:
             TokenStatsCheck(),
             HeadingConsistencyCheck(),
             BrokenImagesCheck(),
-            # 0.2.0+ 후속
-            # DeadLinksCheck(),
+            DeadLinksCheck(),
         ]
     )
 
