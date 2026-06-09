@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "md-doctor"
+version = "0.1.0"
+description = "마크다운 품질 진단 + 후처리 CLI — 데드 링크, 깨진 이미지, 한국어 헤딩 일관성, 토큰 효율 통계"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "sigco3111" },
+]
+keywords = [
+    "markdown",
+    "linter",
+    "korean",
+    "docs",
+    "ci",
+    "static-analysis",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+
+# 기본 의존성: zero-deps (stdlib only)
+dependencies = []
+
+[project.optional-dependencies]
+# (0.2.0+) 외부 사전/한국어 형태소 분석 — 기본은 stdlib만
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+    "build>=0.10",
+]
+
+[project.scripts]
+md-doctor = "md_doctor.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/sigco3111/md-doctor"
+Repository = "https://github.com/sigco3111/md-doctor.git"
+Issues = "https://github.com/sigco3111/md-doctor/issues"
+Changelog = "https://github.com/sigco3111/md-doctor/blob/main/CHANGELOG.md"
+
+# ----------------------------------------------------------------------------
+# Tool configuration
+# ----------------------------------------------------------------------------
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["md_doctor*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+markers = [
+    "network: marks tests that require network access (deselect with '-m \"not network\"')",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM"]
+ignore = ["E501"]  # line-length은 formatter가 처리
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # 0.1.0에서는 점진적 타이핑
+ignore_missing_imports = true
