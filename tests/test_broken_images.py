@@ -153,3 +153,26 @@ def test_diagnose_tree_handles_broken_images_in_subdirs(tmp_path: Path):
     }
     assert len(bi_by_file["a.md"]) == 1
     assert bi_by_file["b.md"] == []
+
+# BI002: HTML <img src> --------------------------------------------------
+
+
+def test_html_img_missing_emits_bi002(tmp_path: Path):
+    md = tmp_path / "doc.md"
+    md.write_text('<img src="missing.png" alt="x">\n', encoding="utf-8")
+    fr = diagnose_file(md)
+    bi002 = [d for d in fr.diagnoses if d.rule == "BI002"]
+    assert len(bi002) == 1
+    assert bi002[0].severity is Severity.ERROR
+    assert bi002[0].line == 1
+
+
+def test_html_img_existing_no_diagnosis(tmp_path: Path):
+    img = tmp_path / "ok.png"
+    img.write_bytes(b"\x89PNG\r\n\x1a\n")
+    md = tmp_path / "doc.md"
+    md.write_text('<img src="ok.png" alt="x">\n', encoding="utf-8")
+    fr = diagnose_file(md)
+    bi = [d for d in fr.diagnoses if d.check == "broken-images"]
+    assert bi == []
+
