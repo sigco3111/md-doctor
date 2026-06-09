@@ -5,6 +5,23 @@ All notable changes to **md-doctor** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-06-09
+
+### Added
+- 🔗 `dead-links` check (DL001) — 로컬 파일 + 외부 URL HEAD 검사
+- 🧪 `extractors/links.py` — `LinkRef` + `extract_link_refs()` (인라인/참조/단축/자동 + 정의 테이블)
+- 🛡️ 외부 검사는 `urllib` HEAD (zero-deps 유지) + 5초 타임아웃
+- ✅ 20 신규 테스트 (추출기 10 + 체크 8 + CLI 2), 총 61개
+
+### Changed
+- 기본 레지스트리: 3 → 4 활성 검사 (token-stats, heading-consistency, broken-images, dead-links)
+- 종료 코드: 데드 링크 발견 시 1
+
+### Notes
+- 외부 URL HEAD 만 검사, GET fallback 없음 (v0.3.0+ 후보).
+- 캐시/병렬/재시도 없음 (단순함 우선). v0.3.0+ 에서 추가.
+- HTML `<a href>` 추출은 v0.3.0+ 에서 다룸 (YAGNI).
+
 ## [0.2.0] - 2026-06-09
 
 ### Added

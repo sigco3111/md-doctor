@@ -97,10 +97,11 @@ for fr in tree.files_with_issues(min_severity=Severity.WARNING):
 | | HC003 | INFO | ✅ | 단계 헤딩이 1씩 증가하는지 |
 | | HC004 | WARNING | ✅ | 빈 헤딩 |
 | **broken-images** | BI001 | ERROR | ✅ 0.2.0 | `![](...)` 참조의 유효성 (로컬) |
-| **dead-links** | DL001 | ERROR | 🚧 0.2.1 | 외부/내부 링크 HEAD 요청 |
+| **dead-links** | DL001 | ERROR | ✅ 0.2.1 | 외부/내부 링크 HEAD (5s 타임아웃) |
 
 > **0.1.0**: token-stats + heading-consistency 활성.
-> **0.2.0**: + broken-images (로컬) 활성. dead-links 는 0.2.1+ 에서 활성.
+> **0.2.0**: + broken-images (로컬) 활성.
+> **0.2.1**: + dead-links (로컬 + URL HEAD) 활성.
 
 ### 출력 예시
 
@@ -146,7 +147,8 @@ jobs:
 ## 🗺️ 로드맵
 
 - **0.1.0** ✅ — 프로젝트 부트스트랩, CLI 뼈대, token-stats + heading-consistency
-- **0.2.0** ✅ — broken-images (로컬) 활성화, dead-links 는 0.2.1+ 에서
+- **0.2.0** ✅ — broken-images (로컬) 활성화
+- **0.2.1** ✅ — dead-links (로컬 + URL HEAD) 활성화
 - **0.3.0** — GFM/CommonMark 규칙 린트, 코드펜스 내부 인식 정확도 개선
 - **0.4.0** — `md-doctor fix` 자동 후처리 (안전한 변환만: trailing newline 등)
 - **0.5.0** — 한국어 띄어쓰기/맞춤법 검사 (외부 사전 연동, opt-in)
