@@ -56,5 +56,7 @@ def test_strip_inline_code_preserves_position():
     """인라인 코드 영역을 공백으로 치환, 위치 보존."""
     line = "a `code` b"
     result = strip_inline_code(line)
-    assert result == "a       b"
+    # 원본: a(1) + 공백(1) + `(1) + c(1) + o(1) + d(1) + e(1) + `(1) + 공백(1) + b(1) = 10
+    # strip 후: a + 8 spaces + b = 10 chars
+    assert result == "a        b"
     assert len(result) == len(line)
