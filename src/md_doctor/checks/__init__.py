@@ -65,9 +65,9 @@ def default_checks() -> CheckRegistry:
         checks=[
             TokenStatsCheck(),
             HeadingConsistencyCheck(),
-            # 0.2.0+ 예정 (스텁은 만들어 두되 기본 비활성)
+            BrokenImagesCheck(),
+            # 0.2.0+ 후속
             # DeadLinksCheck(),
-            # BrokenImagesCheck(),
         ]
     )
 
