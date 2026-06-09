@@ -101,6 +101,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="--fix 모드 실제 변경 없이 요약만",
     )
     parser.add_argument(
+        "--korean",
+        action="store_true",
+        help="한국어 띄어쓰기/맞춤법 검사 opt-in (KS1~KS5)",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f"%(prog)s {__version__}",
@@ -286,6 +291,12 @@ def main(argv: list[str] | None = None) -> int:
     fail_on = Severity(args.fail_on) if args.fail_on != "never" else None
     checks = args.checks.split(",") if args.checks else None
     registry = _filter_registry(checks)
+
+    # v0.5.0: --korean opt-in → registry 에 korean-grammar 자동 추가
+    if args.korean:
+        from md_doctor.checks.korean_grammar import KoreanGrammarCheck
+        if not any(c.name == "korean-grammar" for c in registry.checks):
+            registry.checks.append(KoreanGrammarCheck())
 
     try:
         if path.is_dir():
