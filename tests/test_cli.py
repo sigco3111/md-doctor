@@ -144,11 +144,12 @@ def test_default_checks_have_unique_names():
     reg = default_checks()
     names = reg.names()
     assert len(names) == len(set(names)), f"중복 검사 이름: {names}"
-    # 0.1.0: 2개 활성. 0.2.0: 3개 활성. 0.2.1: 4개 활성 (dead-links 추가).
+    # 0.1.0: 2개 활성. 0.2.0: 3개 활성. 0.2.1: 4개 활성. 0.3.0: 5개 활성 (gfm-lint 추가).
     assert "token-stats" in names
     assert "heading-consistency" in names
     assert "broken-images" in names
     assert "dead-links" in names
+    assert "gfm-lint" in names
 
 
 # ---------------------------------------------------------------------------
@@ -274,3 +275,24 @@ def test_cli_fails_on_dead_link(tmp_path: Path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "[DL001]" in out
     assert "404" in out
+
+
+# gfm-lint CLI 통합 ----------------------------------------------------
+
+
+def test_cli_runs_gfm_lint_check(tmp_path: Path, capsys):
+    """`--checks gfm-lint` 로 단독 실행 가능."""
+    md = tmp_path / "clean.md"
+    md.write_text("# Title\n\n- a\n- b\n", encoding="utf-8")
+    rc = main([str(md), "--checks", "gfm-lint", "--format", "text"])
+    assert rc == 0
+
+
+def test_cli_fails_on_gfm_lint_warning(tmp_path: Path, capsys):
+    """gfm-lint WARNING 발견 시 exit 1."""
+    md = tmp_path / "bad.md"
+    md.write_text("- a\n* b\n", encoding="utf-8")
+    rc = main([str(md), "--format", "text"])
+    assert rc == 1
+    out = capsys.readouterr().out
+    assert "[HC005]" in out
