@@ -5,6 +5,25 @@ All notable changes to **md-doctor** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-06-09
+
+### Added
+- 🆕 `gfm-lint` check (HC005~HC008) — 리스트 점 일관성, 코드언어 지정, raw HTML, 테이블 정렬
+- 🧪 `extractors/code_fence.py` — 코드펜스 + 인라인 코드 마킹 공통 헬퍼
+- 🧪 `extractors/html.py` — HTML 태그 추출 (<img>, <a>, <div> 등)
+- 🔗 `BrokenImagesCheck` HTML 확장 (BI002) — `<img src>` 추출
+- 🔗 `DeadLinksCheck` HTML 확장 (DL002) — `<a href>` 추출
+- ✅ 28 신규 테스트 (code_fence 6, html 8, gfm-lint 11, broken/dead +2×2, cli +2), 총 90개
+
+### Changed
+- 기본 레지스트리: 4 → 5 활성 검사 (+gfm-lint)
+- `extractors/images.py`/`links.py` 가 `code_fence.strip_inline_code` 위임 (동작 100% 보존)
+
+### Notes
+- GFM/CommonMark 핵심 규칙 4개 (HC005-008) 만 포함. 작업 목록, 각주 등은 v0.3.x 후속.
+- HTML 추출은 정규식 기반. 정밀 파서는 v0.4.0+ 후보.
+- zero-deps 정책 유지.
+
 ## [0.2.1] - 2026-06-09
 
 ### Added
