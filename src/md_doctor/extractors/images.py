@@ -11,6 +11,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from md_doctor.extractors.code_fence import strip_inline_code as _strip_inline_code
+
 
 @dataclass(frozen=True)
 class ImageRef:
@@ -81,21 +83,3 @@ def extract_image_refs(
                 col += 1  # 1-based
             refs.append(ImageRef(target=target, line=i, col=col, alt=alt))
     return refs
-
-
-def _strip_inline_code(line: str) -> str:
-    """인라인 코드(`...`) 영역을 공백으로 치환 (위치 보존).
-
-    코드 외부의 `![...](...)` 매칭은 그대로 유지.
-    """
-    out: list[str] = []
-    in_code = False
-    for ch in line:
-        if ch == "`":
-            in_code = not in_code
-            out.append(" ")  # 백틱 자체를 공백으로
-        elif in_code:
-            out.append(" ")
-        else:
-            out.append(ch)
-    return "".join(out)
