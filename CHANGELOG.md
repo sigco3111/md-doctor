@@ -5,6 +5,21 @@ All notable changes to **md-doctor** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-06-09
+
+### Added
+- 🎯 **안정 API** — 1.0.0 이후 시맨틱 버전 유지, BACKWARD COMPATIBLE 보장
+- 📚 `docs/superpowers/api.md` — Public API Reference
+- 🧪 5개 정확도 벤치마크 픽스처 — `tests/fixtures/benchmark/`
+- 📊 정확도 측정 (`tests/test_benchmark.py`) — recall/precision/F1
+- ✅ 6 신규 테스트 (벤치마크), 총 125개
+
+### Notes
+- API 변경 0건 (마커만 추가). 모든 v0.5.0 → v1.0.0 사용자 코드 그대로 동작.
+- 정확도 벤치마크 임계값: recall ≥ 0.9, precision ≥ 0.8, F1 ≥ 0.85.
+- PyPI 정식 배포는 1.0.0+ 후속 (zero-deps 패키지 골격은 준비됨).
+- zero-deps 정책 유지.
+
 ## [0.5.0] - 2026-06-09
 
 ### Added

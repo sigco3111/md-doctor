@@ -116,6 +116,7 @@ for fr in tree.files_with_issues(min_severity=Severity.WARNING):
 > **0.2.0**: + broken-images (로컬) 활성.
 > **0.2.1**: + dead-links (로컬 + URL HEAD) 활성.
 > **0.3.0**: + gfm-lint (HC005-008) + HTML `<img>`/`<a>` 추출.
+> **0.4.0**: + `--fix` (6 안전 변환) + **1.0.0**: 안정 API + 정확도 벤치마크.
 
 ### 출력 예시
 
@@ -166,6 +167,7 @@ jobs:
 - **0.3.0** ✅ — GFM/CommonMark 린트 (gfm-lint + HTML 추출)
 - **0.4.0** ✅ — md-doctor --fix (6개 안전 변환)
 - **0.5.0** ✅ — --korean opt-in (KS1-5, zero-deps)
+- **1.0.0** ✅ — 안정 API + 정확도 벤치마크 (125 테스트)
 - **0.3.0** — GFM/CommonMark 규칙 린트, 코드펜스 내부 인식 정확도 개선
 - **0.4.0** — `md-doctor fix` 자동 후처리 (안전한 변환만: trailing newline 등)
 - **0.5.0** — 한국어 띄어쓰기/맞춤법 검사 (외부 사전 연동, opt-in)
