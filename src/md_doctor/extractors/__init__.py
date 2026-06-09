@@ -5,8 +5,11 @@
 """
 
 from md_doctor.extractors.images import ImageRef, extract_image_refs
+from md_doctor.extractors.links import LinkRef, extract_link_refs
 
 __all__ = [
     "ImageRef",
     "extract_image_refs",
+    "LinkRef",
+    "extract_link_refs",
 ]
