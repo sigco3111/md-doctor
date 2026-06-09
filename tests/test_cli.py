@@ -144,10 +144,11 @@ def test_default_checks_have_unique_names():
     reg = default_checks()
     names = reg.names()
     assert len(names) == len(set(names)), f"중복 검사 이름: {names}"
-    # 0.1.0: 2개 활성. 0.2.0: 3개 활성 (broken-images 추가).
+    # 0.1.0: 2개 활성. 0.2.0: 3개 활성. 0.2.1: 4개 활성 (dead-links 추가).
     assert "token-stats" in names
     assert "heading-consistency" in names
     assert "broken-images" in names
+    assert "dead-links" in names
 
 
 # ---------------------------------------------------------------------------
