@@ -6,8 +6,9 @@ HTML ``<img src>`` 는 0.3.0+ 에서 다룸 (YAGNI).
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from md_doctor.checks import BaseCheck
 from md_doctor.extractors.images import extract_image_refs

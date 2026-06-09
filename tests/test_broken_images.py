@@ -7,7 +7,6 @@ from pathlib import Path
 from md_doctor import Severity
 from md_doctor.core import diagnose_file, diagnose_tree
 
-
 # 픽스처 헬퍼 ----------------------------------------------------------
 
 
