@@ -1,7 +1,7 @@
 """데드 링크 검사 — 로컬 파일 + 외부 URL HEAD.
 
 원격 URL 은 urllib HEAD 로 검사. 4xx/5xx/타임아웃 → ERROR.
-HTML ``<a href>`` 와 인증/쿠키는 0.3.0+ 에서 다룸 (YAGNI).
+HTML ``<a href>`` 는 v0.3.0+ 에서 처리.
 """
 
 from __future__ import annotations
@@ -13,11 +13,13 @@ from pathlib import Path
 from typing import Any
 
 from md_doctor.checks import BaseCheck
-from md_doctor.extractors.links import extract_link_refs
+from md_doctor.extractors.code_fence import mark_code_regions
+from md_doctor.extractors.html import extract_html_refs
+from md_doctor.extractors.links import LinkRef, extract_link_refs
 from md_doctor.models import Diagnosis, Severity
 
 _DEFAULT_TIMEOUT = 5.0
-_USER_AGENT = "md-doctor/0.2.1 (+https://github.com/sigco3111/md-doctor)"
+_USER_AGENT = "md-doctor/0.3.0 (+https://github.com/sigco3111/md-doctor)"
 
 
 def head_request(url: str, timeout: float = _DEFAULT_TIMEOUT) -> int:
@@ -45,23 +47,49 @@ def head_request(url: str, timeout: float = _DEFAULT_TIMEOUT) -> int:
 
 
 class DeadLinksCheck(BaseCheck):
-    """로컬 + 외부 링크의 유효성 검사 (DL001)."""
+    """로컬 + 외부 + HTML 링크의 유효성 검사 (DL001/DL002)."""
 
     name = "dead-links"
 
     def run(self, context: dict[str, Any]) -> Iterator[Diagnosis]:
         path: Path = context["path"]
         base_dir = path.parent
-        refs = extract_link_refs(context["text"], context["lines"])
+        fences = mark_code_regions(context["lines"])
 
-        for ref in refs:
+        # 마크다운 추출
+        md_refs = list(extract_link_refs(context["text"], context["lines"]))
+
+        # HTML 추출 (DL002)
+        html_refs = list(self._html_to_link_refs(
+            extract_html_refs(context["text"], context["lines"], fences)
+        ))
+
+        for ref in md_refs:
             if ref.kind == "definition":
                 continue
-
             if _is_local_path(ref.target):
-                yield from _check_local(base_dir, ref)
+                yield from _check_local(base_dir, ref, rule="DL001")
             else:
-                yield from _check_remote(ref)
+                yield from _check_remote(ref, rule="DL001")
+
+        for ref in html_refs:
+            if _is_local_path(ref.target):
+                yield from _check_local(base_dir, ref, rule="DL002")
+            else:
+                yield from _check_remote(ref, rule="DL002")
+
+    @staticmethod
+    def _html_to_link_refs(html_refs) -> Iterator[LinkRef]:
+        """HtmlRef(tag='a') → LinkRef 변환."""
+        for ref in html_refs:
+            if ref.tag == "a" and "href" in ref.attrs:
+                yield LinkRef(
+                    target=ref.attrs["href"],
+                    line=ref.line,
+                    col=ref.col,
+                    text="",
+                    kind="autolink",
+                )
 
 
 def _is_local_path(url: str) -> bool:
@@ -69,7 +97,7 @@ def _is_local_path(url: str) -> bool:
     return "://" not in url
 
 
-def _check_local(base_dir: Path, ref) -> Iterator[Diagnosis]:
+def _check_local(base_dir: Path, ref, *, rule: str = "DL001") -> Iterator[Diagnosis]:
     try:
         target = _resolve_local(base_dir, ref.target)
     except (ValueError, OSError) as e:
@@ -78,7 +106,7 @@ def _check_local(base_dir: Path, ref) -> Iterator[Diagnosis]:
             severity=Severity.ERROR,
             message=f"깨진 링크: 경로 해석 실패 '{ref.target}': {e}",
             line=ref.line,
-            rule="DL001",
+            rule=rule,
         )
         return
 
@@ -88,7 +116,7 @@ def _check_local(base_dir: Path, ref) -> Iterator[Diagnosis]:
             severity=Severity.ERROR,
             message=f"깨진 링크: '{ref.target}' (해상: {target})",
             line=ref.line,
-            rule="DL001",
+            rule=rule,
         )
         return
 
@@ -98,11 +126,11 @@ def _check_local(base_dir: Path, ref) -> Iterator[Diagnosis]:
             severity=Severity.ERROR,
             message=f"깨진 링크: '{ref.target}' 은(는) 디렉터리입니다",
             line=ref.line,
-            rule="DL001",
+            rule=rule,
         )
 
 
-def _check_remote(ref) -> Iterator[Diagnosis]:
+def _check_remote(ref, *, rule: str = "DL001") -> Iterator[Diagnosis]:
     try:
         status = head_request(ref.target, timeout=_DEFAULT_TIMEOUT)
     except (urllib.error.URLError, TimeoutError, OSError) as e:
@@ -112,7 +140,7 @@ def _check_remote(ref) -> Iterator[Diagnosis]:
             severity=Severity.ERROR,
             message=f"데드 링크: '{ref.target}' (연결 실패: {reason})",
             line=ref.line,
-            rule="DL001",
+            rule=rule,
         )
         return
 
@@ -122,7 +150,7 @@ def _check_remote(ref) -> Iterator[Diagnosis]:
             severity=Severity.ERROR,
             message=f"데드 링크: '{ref.target}' (HTTP {status})",
             line=ref.line,
-            rule="DL001",
+            rule=rule,
         )
 
 
