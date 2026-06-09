@@ -296,3 +296,38 @@ def test_cli_fails_on_gfm_lint_warning(tmp_path: Path, capsys):
     assert rc == 1
     out = capsys.readouterr().out
     assert "[HC005]" in out
+
+
+# korean-grammar CLI 통합 -----------------------------------------------
+
+
+def test_cli_no_korean_flag_no_check(tmp_path: Path, capsys):
+    """--korean 없으면 korean-grammar 비활성."""
+    md = tmp_path / "test.md"
+    md.write_text("Python은 좋다", encoding="utf-8")
+    rc = main([str(md), "--format", "json"])
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    korean = [
+        d
+        for f in payload["files"]
+        for d in f["diagnoses"]
+        if d["check"] == "korean-grammar"
+    ]
+    assert korean == []
+
+
+def test_cli_with_korean_flag_active(tmp_path: Path, capsys):
+    """--korean 있으면 korean-grammar 활성."""
+    md = tmp_path / "test.md"
+    md.write_text("Python은 좋다", encoding="utf-8")
+    rc = main([str(md), "--korean", "--format", "json"])
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    korean = [
+        d
+        for f in payload["files"]
+        for d in f["diagnoses"]
+        if d["check"] == "korean-grammar"
+    ]
+    assert len(korean) >= 1

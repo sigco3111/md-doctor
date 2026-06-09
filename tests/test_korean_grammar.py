@@ -6,18 +6,25 @@ from pathlib import Path
 import tempfile
 
 from md_doctor import Severity
+from md_doctor.checks import CheckRegistry
+from md_doctor.checks.korean_grammar import KoreanGrammarCheck
 from md_doctor.core import diagnose_file
 
 
 def _run(text: str) -> list:
-    """테스트 헬퍼: text 를 임시 파일로 진단, korean-grammar 결과만 반환."""
+    """테스트 헬퍼: text 를 임시 파일로 진단, korean-grammar 결과만 반환.
+
+    opt-in 검사이므로 명시적 registry 로 호출.
+    """
+    from md_doctor.core import diagnose_file
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".md", delete=False, encoding="utf-8"
     ) as f:
         f.write(text)
         path = Path(f.name)
     try:
-        fr = diagnose_file(path)
+        registry = CheckRegistry(checks=[KoreanGrammarCheck()])
+        fr = diagnose_file(path, registry=registry)
         return [d for d in fr.diagnoses if d.check == "korean-grammar"]
     finally:
         path.unlink()
