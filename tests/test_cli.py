@@ -244,3 +244,33 @@ def test_cli_github_output_includes_broken_image(tmp_path: Path, capsys):
     out = capsys.readouterr().out
     assert "::error file=" in out
     assert "missing.png" in out
+
+
+# ---------------------------------------------------------------------------
+# dead-links CLI 통합
+# ---------------------------------------------------------------------------
+
+
+def test_cli_runs_dead_links_check(tmp_path: Path, monkeypatch, capsys):
+    """`--checks dead-links` 로 단독 실행 가능 (외부 URL 200 mock)."""
+    md = tmp_path / "doc.md"
+    md.write_text("[OK](https://example.com)\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "md_doctor.checks.dead_links.head_request", lambda url, timeout=5.0: 200
+    )
+    rc = main([str(md), "--checks", "dead-links", "--format", "text"])
+    assert rc == 0
+
+
+def test_cli_fails_on_dead_link(tmp_path: Path, monkeypatch, capsys):
+    """데드 링크 → exit 1 + ERROR 라인 출력."""
+    md = tmp_path / "doc.md"
+    md.write_text("[Dead](https://missing.example.com)\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "md_doctor.checks.dead_links.head_request", lambda url, timeout=5.0: 404
+    )
+    rc = main([str(md), "--format", "text"])
+    assert rc == 1
+    out = capsys.readouterr().out
+    assert "[DL001]" in out
+    assert "404" in out
