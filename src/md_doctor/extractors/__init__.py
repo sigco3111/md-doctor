@@ -4,12 +4,25 @@
 체크 모듈은 추출기 결과를 받아 진단으로 변환한다.
 """
 
+from md_doctor.extractors.code_fence import (
+    CodeFence,
+    is_in_code_region,
+    mark_code_regions,
+    strip_inline_code,
+)
+from md_doctor.extractors.html import HtmlRef, extract_html_refs
 from md_doctor.extractors.images import ImageRef, extract_image_refs
 from md_doctor.extractors.links import LinkRef, extract_link_refs
 
 __all__ = [
+    "CodeFence",
+    "HtmlRef",
     "ImageRef",
-    "extract_image_refs",
     "LinkRef",
+    "extract_html_refs",
+    "extract_image_refs",
     "extract_link_refs",
+    "is_in_code_region",
+    "mark_code_regions",
+    "strip_inline_code",
 ]
