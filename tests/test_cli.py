@@ -206,3 +206,40 @@ def test_cli_missing_path(capsys):
     assert rc == 2
     err = capsys.readouterr().err
     assert "존재하지 않습니다" in err
+
+
+# ---------------------------------------------------------------------------
+# broken-images CLI 통합
+# ---------------------------------------------------------------------------
+
+
+def test_cli_runs_broken_images_check(tmp_path: Path, capsys):
+    """`--checks broken-images` 로 단독 실행 가능."""
+    img = tmp_path / "ok.png"
+    img.write_bytes(b"\x89PNG\r\n\x1a\n")
+    md = tmp_path / "doc.md"
+    md.write_text(f"![OK]({img.name})\n", encoding="utf-8")
+    rc = main([str(md), "--checks", "broken-images", "--format", "text"])
+    assert rc == 0
+
+
+def test_cli_fails_on_broken_image(tmp_path: Path, capsys):
+    """깨진 이미지 → exit 1 + ERROR 라인 출력."""
+    md = tmp_path / "doc.md"
+    md.write_text("![](missing.png)\n", encoding="utf-8")
+    rc = main([str(md), "--format", "text"])
+    assert rc == 1  # default --fail-on warning → ERROR 포함 시 1
+    out = capsys.readouterr().out
+    assert "[BI001]" in out
+    assert "missing.png" in out
+
+
+def test_cli_github_output_includes_broken_image(tmp_path: Path, capsys):
+    """GitHub Actions 워크플로 명령에 ERROR 라인 포함."""
+    md = tmp_path / "doc.md"
+    md.write_text("![](missing.png)\n", encoding="utf-8")
+    rc = main([str(md), "--format", "github", "--min-severity", "error"])
+    assert rc == 1
+    out = capsys.readouterr().out
+    assert "::error file=" in out
+    assert "missing.png" in out
