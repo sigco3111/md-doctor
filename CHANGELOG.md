@@ -5,6 +5,22 @@ All notable changes to **md-doctor** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-06-09
+
+### Added
+- 🖼️ `broken-images` check (BI001) — 로컬 `![](...)` 참조의 `Path.exists()` 검사
+- 🧪 `extractors/images.py` — `ImageRef` + `extract_image_refs()` (재사용 가능한 추출기)
+- ✅ 25 신규 테스트 (추출기 11 + 체크 11 + CLI 3), 총 41개
+
+### Changed
+- 기본 레지스트리: 2 → 3 활성 검사 (token-stats, heading-consistency, broken-images)
+- 종료 코드: 깨진 이미지 발견 시 1 (default `--fail-on warning`)
+
+### Notes
+- v0.2.0의 `broken-images` 는 **로컬 파일만** 검사 (zero-deps / offline-first 유지).
+- 원격 URL (http/https) 은 `dead-links` 의 범위 (v0.2.1+ 또는 v0.3.0+).
+- HTML `<img src>` 추출은 v0.3.0+ 에서 다룸 (YAGNI).
+
 ## [0.1.0] - 2026-06-09
 
 ### Added

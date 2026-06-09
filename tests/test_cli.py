@@ -88,7 +88,7 @@ def md_tree(tmp_path: Path) -> Path:
 
 def test_version_is_string():
     assert isinstance(__version__, str)
-    assert __version__ == "0.1.0"
+    assert __version__ == "0.2.0"
 
 
 def test_severity_rank():
@@ -159,7 +159,7 @@ def test_cli_text_output(sample_md: Path, capsys):
     rc = main([str(sample_md), "--format", "text", "--min-severity", "info"])
     assert rc == 0
     out = capsys.readouterr().out
-    assert "md-doctor v0.1.0" in out
+    assert "md-doctor v0.2.0" in out
     assert "1개 파일 스캔" in out
 
 
@@ -168,7 +168,7 @@ def test_cli_json_output(sample_md: Path, capsys):
     assert rc == 0
     out = capsys.readouterr().out
     payload = json.loads(out)
-    assert payload["version"] == "0.1.0"
+    assert payload["version"] == "0.2.0"
     assert payload["summary"]["total_files"] == 1
 
 
